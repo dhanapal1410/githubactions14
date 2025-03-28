@@ -1,3 +1,4 @@
+/*
 resource "google_compute_network" "vpcnet" {
   name = "terraform-network"
 }
@@ -20,6 +21,17 @@ resource "google_compute_firewall" "gfirewall" {
 
   source_ranges = ["0.0.0.0/0"]
 }
+*/
+
+// Reference the existing network
+data "google_compute_network" "existing_network" {
+  name = "terraform-network"
+}
+
+data "google_compute_subnetwork" "existing_subnetwork" {
+  name   = "terraform-subnetwork"
+  region = "us-central1"
+}
 
 resource "google_compute_instance" "ginstance" {
   name         = "web-server"
@@ -33,8 +45,8 @@ resource "google_compute_instance" "ginstance" {
   }
 
   network_interface {
-    network    = google_compute_network.vpcnet.name
-    subnetwork = google_compute_subnetwork.vpcsubnet.name
+    network    = data.google_compute_network.existing_network.self_link
+    subnetwork = data.google_compute_subnetwork.existing_subnetwork.self_link
     access_config {}
   }
 
